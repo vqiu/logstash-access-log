@@ -1,0 +1,35 @@
+input {
+    file {
+        path => [ "/data/logs/nginx/access/*.log" ]
+        codec => json
+        }
+}
+
+filter {
+    mutate {
+        convert => [ "status","integer" ]
+        convert => [ "sent","integer" ]
+        convert => [ "content_len","integer" ]
+        convert => [ "request_time","float" ]
+        convert => [ "up_conn_time","float" ]
+        convert => [ "up_resp_time","float" ]
+#        remove_field => "message"
+    }
+
+    geoip {
+        source => "client"
+        target => "geoip"
+        fields => [ "location", "city_name", "country_name", "region_name" ]
+    }
+}
+
+
+output {
+    elasticsearch {
+        hosts => "http://192.168.30.75:9200"
+        index => "logstash-web-access-%{+YYYY.MM.dd}"
+        template_overwrite => "true"
+        manage_template => "true"
+    }
+    #stdout {codec => rubydebug}
+}

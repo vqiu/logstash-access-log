@@ -1,0 +1,14 @@
+[Unit]
+Description=Logstash
+Documentation=https://www.elastic.co/products/logstash
+After=network.target
+ConditionPathExists=/etc/logstash/conf.d/nginx.conf
+
+[Service]
+Restart=always
+Nice=19
+ExecStart=/opt/$tag/app/logstash/bin/logstash -f /etc/logstash/conf.d/nginx.conf
+LimitNOFILE=16384
+
+[Install]
+WantedBy=multi-user.target
